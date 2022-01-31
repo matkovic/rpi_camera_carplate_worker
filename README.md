@@ -42,3 +42,11 @@ In short - I downloaded videos, that were detected in previous step, to my main 
 Model that was used in this project - ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03
 
 This model needs to be transformed to TFlite model, which can later be used in Raspberry Pi (look at this for more detailed guide - [_TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi_](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi)).
+
+### 3. Detect car plates in action
+
+With the result of previous step, now we can use our model to detect car plates in front of our house.
+
+Here comes _RPi_Cam_Web_Interface_ and in combination with [previous tutorial](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi)'s script, now we can constantly use our model for car plate detection via video stream (from RPI Cam Web Interface) or directly on camera without intermediary step.
+
+Now I do not want to do the latter, since constantly checking if there is any car plate in camera view using our TFLite model heats up our Raspberry Pi. A compromise that I decided for is to use _RPi_Cam_Web_Interface_'s motion detector and start the TFLite model script (reading via http video stream) when the motion starts and end (kill the process) when the motion ends.
