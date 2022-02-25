@@ -2,7 +2,7 @@
 
 ... work in progress ...
 
-A project where I use Raspberry Pi as a smart camera to detects car plates. The idea behind is to detect cars car plate (e.g. in front yard/close to garage door), recognize characters and make some action, based on if the car plate on detected car are from your car or someone elses. 
+A project where I use Raspberry Pi as a smart camera to detects car plates. The idea behind is to detect cars car plate (e.g. in front yard/close to garage door), recognize characters and make some action, based on if the car plate on detected car are from your car or someone elses. The action that can be triggered is in this case triggering RF signal to open garage door (or RF wireless bell).
 
 ## Hardware & equipment
 
@@ -13,6 +13,7 @@ List of stuff in my setup:
 * camera stand
 * M42 Mount to C-Mount Screw Lens
 * M42 lens
+* RF (433) wireless bell
 
 
 ## Software
@@ -22,6 +23,8 @@ Very useful repositories and links also used during my project:
 * [
 TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10](https://github.com/EdjeElectronics/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10)
 * [TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi)
+* [rpitx](https://github.com/F5OEO/rpitx)
+* [sqlite-web](https://github.com/coleifer/sqlite-web)
 
 
 ## Steps
@@ -50,6 +53,14 @@ With the result of previous step, now we can use our model to detect car plates 
 Here comes _RPi_Cam_Web_Interface_ and in combination with [previous tutorial](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi)'s script, now we can constantly use our model for car plate detection via video stream (from RPI Cam Web Interface) or directly on camera without intermediary step.
 
 Now I do not want to do the latter, since constantly checking if there is any car plate in camera view using our TFLite model heats up our Raspberry Pi. A compromise that I decided for is to use _RPi_Cam_Web_Interface_'s motion detector and start the TFLite model script (reading via http video stream) when the motion starts and end (kill the process) when the motion ends.
+
+### 4. Log data
+
+Log data that was detected in previous step by saving it to folder structure and some mini database (sqlite) on the RPi.
+
+### 5. Trigger action
+
+If some specific data was detected in the previous step, now we can trigger RF signal using *rpitx*'s `sendiq` script.
 
 ---
 
