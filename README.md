@@ -50,3 +50,33 @@ With the result of previous step, now we can use our model to detect car plates 
 Here comes _RPi_Cam_Web_Interface_ and in combination with [previous tutorial](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi)'s script, now we can constantly use our model for car plate detection via video stream (from RPI Cam Web Interface) or directly on camera without intermediary step.
 
 Now I do not want to do the latter, since constantly checking if there is any car plate in camera view using our TFLite model heats up our Raspberry Pi. A compromise that I decided for is to use _RPi_Cam_Web_Interface_'s motion detector and start the TFLite model script (reading via http video stream) when the motion starts and end (kill the process) when the motion ends.
+
+---
+
+## Setup stuff
+
+Create folder for saving detected images in www folder to be accessible through browser and allow nologin user to make new files here:
+```
+mkdir /var/www/imgs/
+sudo chmod o+rwx /var/www/imgs/
+```
+
+*RPi-Cam-Web-Interface* - enable motion detection on startup:
+```
+sudo vim /etc/raspimjpeg
+```
+Edit this line
+```
+motion_detection true
+```
+
+
+*Sudoers* allow nologin to run rpitx script:
+```
+sudo visudo
+```
+Add this inside
+```
+#custom
+www-data ALL=NOPASSWD: /home/pi/rpitx/sendiq
+```

@@ -1,0 +1,12 @@
+[Unit]
+Description=Sqlite web - carplate
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c 'source /home/pi/tflite1/tflite1-env/bin/activate && sqlite_web /var/www/imgs/plates.db --port 8081 --read-only --host 0.0.0.0 --no-browser'
+StandardInput=tty-force
+
+[Install]
+WantedBy=multi-user.target

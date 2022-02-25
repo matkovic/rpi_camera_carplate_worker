@@ -25,7 +25,13 @@ import importlib.util
 
 import pytesseract
 from datetime import datetime
-
+from pathlib import Path
+import re
+import traceback
+import uuid
+import sqlite3
+import subprocess
+import shlex
 
 # Define VideoStream class to handle streaming of video from webcam in separate processing thread
 # Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
@@ -69,15 +75,39 @@ class VideoStream:
 	# Indicate that the camera and thread should be stopped
         self.stopped = True
 
-def write_to_file(text_to_write):
-    now = datetime.now()
-    print(str(now) + ": " + text_to_write)
-    # Open a file with access mode 'a'
-    file_object = open('/home/pi/Desktop/picamer/detections_log.txt', 'a+')
-    # Append 'hello' at the end of file
-    file_object.write(str(now) + ": " + text_to_write + '\n')
-    # Close the file
-    file_object.close()
+
+IMGS_ROOT = '/var/www/imgs/'
+
+DB_SAVE = True
+
+if DB_SAVE:
+    con = sqlite3.connect(IMGS_ROOT + 'plates.db')
+
+
+def save_img_structure(timestamp, cv2img, text_plate, uuid):
+    relative_path = str(timestamp.year) + '/' + str(timestamp.month) + '/' + str(timestamp.day) +'/' + str(timestamp.hour) + '/'
+    abs_path = IMGS_ROOT + relative_path
+    Path(abs_path).mkdir(parents=True, exist_ok=True)
+    img_name = text_plate + '_' + uuid + '.jpg'
+    cv2.imwrite(abs_path + img_name , cv2img)
+
+    if DB_SAVE:
+        cur = con.cursor()
+
+        # Create table
+        cur.execute('''CREATE TABLE IF NOT EXISTS carplates
+                    (Id INTEGER PRIMARY KEY AUTOINCREMENT, CreatedTimestamp timestamp, Carplate text, Uuid text, FileLocation text)''')
+
+        # Insert a row of data
+        insertinto_params = """INSERT INTO carplates
+                          ('CreatedTimestamp', 'Carplate', 'Uuid', 'FileLocation') 
+                          VALUES (?, ?, ?, ?);"""
+        cur.execute(insertinto_params, (timestamp, text_plate, uuid, relative_path + img_name))
+        # Save (commit) the changes
+        con.commit()
+
+
+
 
 # Define and parse input arguments
 parser = argparse.ArgumentParser()
@@ -222,39 +252,36 @@ while True:
             object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
             
             #widden_rectangle
-            xmin = xmin - 30
-            xmax = xmax + 30
+            xmin = xmin - 6
+            xmax = xmax + 6
             #ymin = ymin - 20
             #ymax = ymax + 20
-            
-            
             
             text = ""
             
             try:
                 image_object = frame[ymin:ymax, xmin:xmax]
+                text = pytesseract.image_to_string(image_object, config='--psm 6')
+                clamped_str = re.sub(r"[^A-Z0-9-]+", '', text)
+                
                 now = datetime.now()
-                cv2.imwrite('/home/pi/Desktop/picamer/imgs/' + str(now) + '.jpg' , image_object)
-                image_object = cv2.cvtColor(image_object, cv2.COLOR_BGR2RGB)
-                #image_object = cv2.GaussianBlur(image_object, (5, 5), 0)
-                #image_object = cv2.resize(image_object, None, fx = 2, fy = 2, interpolation = cv2.INTER_LINEAR)  # INTER_CUBIC
-
-                #cv2.imshow('plate detect', image_object)
-                # use Tesseract to OCR the image
-                text = pytesseract.image_to_string(image_object)
+                
+                if len(clamped_str) < 4:
+                    clamped_str = 'unidentified'
+                
+                save_img_structure(now, image_object, clamped_str, str(uuid.uuid4())[:5])
+                subprocess.Popen(shlex.split('sudo /home/pi/rpitx/sendiq -s 250000 -f 433.92e6 -t u8 -i /home/pi/rpitx/record.iq'))
             except Exception as exc:
-                print(exc)
-            
-            write_to_file(object_name + ": " + text)
+                print(traceback.format_exc())
             
             label = '%s: %d%%' % (object_name, int(scores[i]*100)) # Example: 'person: 72%'
             labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2) # Get font size
             label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
-            cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
-            cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
+            #cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
+            #cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
 
     # Draw framerate in corner of frame
-    cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
+    #cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
 
     # All the results have been drawn on the frame, so it's time to display it.
     #cv2.imshow('Object detector', frame)
