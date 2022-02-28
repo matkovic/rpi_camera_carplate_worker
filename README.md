@@ -4,6 +4,9 @@
 
 A project where I use Raspberry Pi as a smart camera to detects car plates. The idea behind is to detect cars car plate (e.g. in front yard/close to garage door), recognize characters and make some action, based on if the car plate on detected car are from your car or someone elses. The action that can be triggered is in this case triggering RF signal to open garage door (or RF wireless bell).
 
+![](./imgs/car_plate_garage_nontr-01.png)
+
+
 ## Hardware & equipment
 
 List of stuff in my setup:
