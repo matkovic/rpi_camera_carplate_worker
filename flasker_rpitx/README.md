@@ -1,6 +1,6 @@
 ## Flasker Rpitx
 
-Simple flask application for listening specific request and triggering RF records through rpitx.
+Simple flask application for listening specific request and triggering RF records through [rpitx](https://github.com/F5OEO/rpitx).
 
 flasker_rpitx.service - this runs app.py as a service on startup.
 
