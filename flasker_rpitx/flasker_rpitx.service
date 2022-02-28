@@ -4,7 +4,7 @@ Conflicts=getty@tty1.service
 
 [Service]
 Type=forked
-ExecStart=/bin/bash -c 'export FLASK_APP=/home/pi/flasker_rptix/app.py && flask run --host=0.0.0.0'
+ExecStart=/bin/bash -c 'export FLASK_APP=/home/pi/flasker_rpitx/app.py && flask run --host=0.0.0.0'
 StandardInput=tty-force
 
 [Install]

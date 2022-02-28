@@ -2,16 +2,16 @@
 
 Simple flask application for listening specific request and triggering RF records through rpitx.
 
-flasker_rptix.service - this runs app.py as a service on startup.
+flasker_rpitx.service - this runs app.py as a service on startup.
 
 Commands:
 ```
-vim /etc/systemd/system/flasker_rptix.service
+vim /etc/systemd/system/flasker_rpitx.service
 ```
 
 ```
-systemctl start flasker_rptix.service
-systemctl enable flasker_rptix.service
+systemctl start flasker_rpitx.service
+systemctl enable flasker_rpitx.service
 ```
 
 
