@@ -81,3 +81,8 @@ Edit this line
 motion_detection true
 ```
 
+*Detecting carplates* - see [TensorFlow-Lite-Object-Detection-on-Raspberry-Pi](./TensorFlow-Lite-Object-Detection-on-Raspberry-Pi/README.md)
+
+*Sqlite web viewer* - see [sqlite_db](./sqlite_db/README.md)
+
+*rptix listener* - see [flasker_rpitx](./flasker_rpitx/README.md)
