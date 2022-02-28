@@ -81,13 +81,3 @@ Edit this line
 motion_detection true
 ```
 
-
-*Sudoers* allow nologin to run rpitx script:
-```
-sudo visudo
-```
-Add this inside
-```
-#custom
-www-data ALL=NOPASSWD: /home/pi/rpitx/sendiq
-```

@@ -32,6 +32,7 @@ import uuid
 import sqlite3
 import subprocess
 import shlex
+import requests
 
 # Define VideoStream class to handle streaming of video from webcam in separate processing thread
 # Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
@@ -270,7 +271,7 @@ while True:
                     clamped_str = 'unidentified'
                 
                 save_img_structure(now, image_object, clamped_str, str(uuid.uuid4())[:5])
-                subprocess.Popen(shlex.split('sudo /home/pi/rpitx/sendiq -s 250000 -f 433.92e6 -t u8 -i /home/pi/rpitx/record.iq'))
+                subprocess.Popen(shlex.split('wget http://192.168.68.110:5000'))
             except Exception as exc:
                 print(traceback.format_exc())
             

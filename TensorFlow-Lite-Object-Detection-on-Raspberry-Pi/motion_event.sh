@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# starts as nologin user: test using "sudo -u www-data bash"
+
 if [ $1 = '1' ]
 then
 	source /home/pi/tflite1/tflite1-env/bin/activate
