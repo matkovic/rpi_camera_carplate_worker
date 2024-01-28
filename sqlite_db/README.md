@@ -25,5 +25,5 @@ systemctl start sqlite_carplates.service
 
 Enable on startup
 ```
-systemctl enable mydaemon.service 
+systemctl enable sqlite_carplates.service 
 ```
